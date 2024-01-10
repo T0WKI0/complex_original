@@ -23,3 +23,24 @@ pgClient.on('error', () => console.log('Lost PG connection'));
 pgClient
     .query('CREATE TABLE IF NOT EXISTS valuse (number INT)')
     .catch(err => console.log(err));
+
+// Redis Client Setup
+const redis = require('redis');
+const redisClient = redis.createClient({
+    host: keys.redisHost,
+    port: key.redisPort,
+    retry_strategy: () => 1000
+});
+
+const redisPublisher = redisClient.duplicate();
+
+// Express route handlers
+app.get('/', (req, res) => {
+    res.send('Hi');
+});
+
+app.get('/values/all', async (req, res) => {
+    const values = await pgClient.query('SELECT * FROM values');
+
+    res.send(values.rows)
+});
